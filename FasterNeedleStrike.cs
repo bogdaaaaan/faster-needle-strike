@@ -1,43 +1,64 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using GlobalSettings;
 using HarmonyLib;
-using UnityEngine;
 
-[BepInPlugin("com.bogdaaaaan.hks_fastercharge", "HKS Faster Charge Mod", "1.0.0")]
-public class HKS_FasterCharge : BaseUnityPlugin
+[BepInPlugin("com.bodyando.hks_fasterneedlestrike", "Faster Needle Strike", "1.1.0")]
+public class FasterNeedleStrike : BaseUnityPlugin
 {
     private static ManualLogSource logger;
     // Track previous equipped state
     private static bool? wasQuickToolEquipped = null;
 
-    private static readonly float NEW_CHARGE_TIME = 0.8f;
-    private static readonly float NEW_CHARGE_TIME_QUICK_TOOL = 0.4f;
-
     // Config entry for enabling/disabling the mod
     private static ConfigEntry<bool> ModEnabledConfig;
+    private static ConfigEntry<float> ChargeTimeConfig;
+    private static ConfigEntry<float> ChargeTimeQuickToolConfig;
 
     private void Awake()
     {
         logger = Logger;
-        logger.LogInfo("Plugin loaded and initialized");
+        logger.LogInfo("Faster Needle Strike Mod loaded and initialized");
 
         // Bind the config entry (shows up in the F1 config menu)
         ModEnabledConfig = Config.Bind(
             "General",
             "ModEnabled",
             true,
-            "Enable or disable the HKS Faster Charge Mod"
+            "Enable or disable the Faster Needle Strike"
         );
 
-        // Subscribe to the SettingChanged event
+        ChargeTimeConfig = Config.Bind(
+            "General",
+            "ChargeTime",
+            0.8f,
+            "Charge time without Quick Tool"
+        );
+
+        ChargeTimeQuickToolConfig = Config.Bind(
+            "General",
+            "ChargeTimeQuickTool",
+            0.4f,
+            "Charge time with Quick Tool equipped"
+        );
+
+        // Subscribe to the SettingChanged events
         ModEnabledConfig.SettingChanged += (sender, args) =>
         {
-            logger.LogInfo($"HKS Faster Charge Mod is now {(ModEnabledConfig.Value ? "ENABLED" : "DISABLED")}");
+            logger.LogInfo($"Faster Needle Strike Mod is now {(ModEnabledConfig.Value ? "ENABLED" : "DISABLED")}");
         };
 
-        Harmony.CreateAndPatchAll(typeof(HKS_FasterCharge), null);
+        ChargeTimeConfig.SettingChanged += (sender, args) =>
+        {
+            logger.LogInfo($"Charge Time changed to: {ChargeTimeConfig.Value}");
+        };
+
+        ChargeTimeQuickToolConfig.SettingChanged += (sender, args) =>
+        {
+            logger.LogInfo($"Charge Time with tool changed to: {ChargeTimeQuickToolConfig.Value}");
+        };
+
+        Harmony.CreateAndPatchAll(typeof(FasterNeedleStrike), "com.bodyando.hks_fasterneedlestrike");
         logger.LogDebug("Harmony patches applied.");
     }
 
@@ -65,11 +86,11 @@ public class HKS_FasterCharge : BaseUnityPlugin
             {
                 if (isEquipped)
                 {
-                    logger?.LogInfo($"Quick Tool equipped: Charge time reduced from {original} to {NEW_CHARGE_TIME_QUICK_TOOL}");
+                    logger?.LogInfo($"Quick Tool equipped: Charge time reduced from {original} to {ChargeTimeQuickToolConfig.Value}");
                 }
                 else
                 {
-                    logger?.LogInfo($"Quick Tool not equipped: Charge time reduced from {original} to {NEW_CHARGE_TIME}");
+                    logger?.LogInfo($"Quick Tool not equipped: Charge time reduced from {original} to {ChargeTimeConfig.Value}");
                 }
             }
 
@@ -79,6 +100,6 @@ public class HKS_FasterCharge : BaseUnityPlugin
         if (!ModEnabledConfig.Value)
             return;
 
-        __result = isEquipped ? NEW_CHARGE_TIME_QUICK_TOOL : NEW_CHARGE_TIME;
+        __result = isEquipped ? ChargeTimeQuickToolConfig.Value : ChargeTimeConfig.Value;
     }
 }

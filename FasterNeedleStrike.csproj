@@ -7,8 +7,8 @@
     <ProjectGuid>{B455A0E0-D116-4AD3-9B70-6ADF5EBBA150}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HKS_FasterChargeMod</RootNamespace>
-    <AssemblyName>HKS_FasterChargeMod</AssemblyName>
+    <RootNamespace>FasterNeedleStrike</RootNamespace>
+    <AssemblyName>FasterNeedleStrike</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -86,7 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HKS_FasterChargeMod.cs" />
+    <Compile Include="FasterNeedleStrike.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
